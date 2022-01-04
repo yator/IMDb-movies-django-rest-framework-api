@@ -1,6 +1,6 @@
-import re
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator
+from django.contrib.auth.models import User
 
 class StreamPlatform(models.Model):
     name = models.CharField(max_length=30)
@@ -9,7 +9,6 @@ class StreamPlatform(models.Model):
 
     def __str__(self):
         return self.name
-
 class WatchList(models.Model):
     title = models.CharField(max_length=50)
     storyline = models.CharField(max_length=200)
@@ -29,4 +28,4 @@ class Review(models.Model):
     updated = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return str(self.rating) + " | " + self.watchlist.title    
+        return str(self.rating) + " | " + self.watchlist.title 
