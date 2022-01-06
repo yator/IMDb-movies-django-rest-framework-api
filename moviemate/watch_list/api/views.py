@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework.utils.serializer_helpers import ReturnDict
 from watch_list.models import Review, StreamPlatform, WatchList
 from rest_framework import status
@@ -14,11 +15,21 @@ from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 class ReviewCreate(generics.CreateAPIView):
       serializer_class=ReviewSerializer
 
+      def get_queryset(self):
+
+          return Review.objects.all()
+
       def perform_create(self, serializer):
           pk=self.kwargs.get('pk')
           watchlist = WatchList.objects.get(pk=pk)
 
-          serializer.save(watchlist=watchlist)
+          review_user=self.request.user
+          review_queryset=Review.objects.filter(watchlist=watchlist,review_user=review_user)
+
+          if review_queryset.exists():
+              raise ValidationError("you have already reviewed this movie")
+
+          serializer.save(watchlist=watchlist,review_user=review_user)
 
 
 class ReviewListAV(generics.ListAPIView):
