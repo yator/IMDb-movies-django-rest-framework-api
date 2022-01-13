@@ -1,4 +1,4 @@
-from rest_framework import permissions
+from rest_framework import pagination, permissions
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.utils.serializer_helpers import ReturnDict
@@ -13,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 from rest_framework.throttling import ScopedRateThrottle
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from watch_list.api.pagination import WatchListPagination
 
 
 
@@ -164,7 +165,8 @@ class WatchListGV(generics.ListAPIView):
        throttle_classes = [ScopedRateThrottle]
        throttle_scope = 'review-list'
        filter_backends = [filters.SearchFilter]
-       search_fields = ['title', 'platform__name']        
+       search_fields = ['title', 'platform__name']
+       pagination_class = WatchListPagination      
 
 class WatchListAV(APIView):
      permission_classes=[IsAdminOrReadOnly]   
