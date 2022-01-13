@@ -11,7 +11,20 @@ from rest_framework import generics
 from watch_list.api.permissions import IsAdminOrReadOnly,IsReviewUserReadOnly
 from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 from rest_framework.throttling import ScopedRateThrottle
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
+
+
+
+class UserReview(generics.ListAPIView):
+     #    queryset =Review.objects.all()
+       serializer_class=ReviewSerializer
+    #    permission_classes = [IsAuthenticated]
+       
+       def get_queryset(self):
+           username = self.kwargs['username']
+           return Review.objects.filter(review_user__username=username)
 
 
 
@@ -57,6 +70,8 @@ class ReviewListAV(generics.ListAPIView):
     #    permission_classes = [IsAuthenticated]
        throttle_classes = [ScopedRateThrottle]
        throttle_scope = 'review-list'
+       filter_backends = [DjangoFilterBackend]
+       filterset_fields = ['review_user__username', 'active']
 
 
 
@@ -99,7 +114,8 @@ class ReviewDetailsAV(generics.RetrieveUpdateDestroyAPIView):
 #         return self.destroy(request, *args, **kwargs)
 
 
-        
+
+     
 
 class StreamPlatformListAV(APIView):
     permission_classes=[IsAdminOrReadOnly]   
@@ -139,6 +155,16 @@ class StreamPlaformDetailAV(APIView):
         stream_platform=StreamPlatform.objects.get(pk=pk)
         stream_platform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class WatchListGV(generics.ListAPIView):
+       queryset =WatchList.objects.all()
+       serializer_class=WatchListSerializer
+    #    permission_classes = [IsAuthenticated]
+       throttle_classes = [ScopedRateThrottle]
+       throttle_scope = 'review-list'
+       filter_backends = [filters.SearchFilter]
+       search_fields = ['title', 'platform__name']        
 
 class WatchListAV(APIView):
      permission_classes=[IsAdminOrReadOnly]   
